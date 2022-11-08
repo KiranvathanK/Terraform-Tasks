@@ -1,0 +1,83 @@
+create 3 instance of amazon linux machine(ec2) 
+name master node as ansible-server and hosts nodes as node-1 & node-2 
+
+cd /home/ec2-user/
+vim ec2-user.pem(copy of .pem key text inside)
+chmod 400 ec2-user.pem
+
+vim inventory.txt
+
+ansible-node-1 ansible_host=35.91.193.206 ansible_connection=ssh ansible_user=ec2-user
+ansible-node-2 ansible_host=54.218.176.157 ansible_connection=ssh ansible_user=ec2-user
+
+ansible ansible-node-1 -m ping -i inventroy.txt
+
+ansible ansible-node-2 -m ping -i inventroy.txt
+
+
+
+
+ssh-agent bash -- >(once rebooted machine repeate this step or command)
+cp ec2-key.pem ~/.ssh/  
+ssh-add ~/.ssh/ec2-key.pem  -->(once rebooted machine repeate this step or command)
+
+
+now edit invetroy file give groupname
+vim inventory.txt
+edit 
+      [servers]
+ansible ansible-node-1 -m ping -i inventroy.txt
+ansible ansible-node-2 -m ping -i inventroy.txt
+
+now excute
+ansible servers -m ping -i inventroy.txt
+
+install nginx in nodes
+create yaml file
+ vim install_nginx.yaml
+edit below code
+
+#install nginx using ansible
+#start and enable nginx
+#check status of nginx
+- name: Setup nginx server on myserver list (host group)
+  hosts: servers
+  become: True
+  tasks:
+    - name: Install the latest version of nginx
+      command: sudo amazon-linux-extras install nginx1.12 -y
+      
+
+    - name: Start nginx service
+      service:
+        name: nginx
+        state: started
+
+    - name: Enable nginx service
+      service:
+        name: nginx
+        enabled: yes
+
+    - name: Get nginx installed version
+      command: nginx -v
+
+    - name: Get status of nginx service
+      command: systemctl status nginx
+
+
+edit host details
+sudo vim /etc/ansible/hosts
+
+edit 
+[servers]
+35.91.193.206 <ip address of node1>
+54.218.176.157 <ip address of node2>
+
+run yaml file 
+
+ansible-playbook install_nginx.yaml -v
+
+
+
+
+

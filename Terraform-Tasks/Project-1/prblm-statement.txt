@@ -1,0 +1,13 @@
+Task 1 -
+
+Create EC2 using terraform:
+  1. Create a terraform template with EC2 resource (basic).
+  2. Run terraform from your local machine.
+  3. Modify the template for adding tag or any other values or properties and apply the changes.
+
+Repeat the process for any other AWS resource like S3.
+
+suggestions -
+  1. Create EC2 - https://www.youtube.com/watch?v=E0j40hLwjhI
+  2. Update EC2 - https://learn.hashicorp.com/tutorials/terraform/aws-change
+  3. Use VS code for the code editing - https://code.visualstudio.com/

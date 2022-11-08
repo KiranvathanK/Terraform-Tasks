@@ -1,0 +1,189 @@
+Already ansible installed by using userdata file(ansible.sh)
+login to ansible server
+
+	- ansible --version
+
+update target machine ip inside the ansible host folder
+
+	- sudo vi /etc/ansible/hosts
+
+inside host file updat public ip of target machines
+
+[ubuntu]
+3.10.12.196
+
+now target machine need to connect with ansible server
+
+login to target machine is ubuntu in our case
+
+	- sudo apt-get update 
+
+change to root user
+
+	- sudo su -
+
+create a new user AND give password to that
+
+	- sudo adduser <username>
+	- sudo passwd <username>
+
+for password should not expires for that use below command
+
+	- passwd -x -1 target-1 (if need not mandtory)
+
+change to the created user
+	- su - target-1
+
+	- pwd(to check present directory)
+
+	- ll (to check list of files folders permission details)
+
+genrate new ssh key(inside target mschines)
+
+	- ssh-keygen(enter upto create a key)
+
+(it will give some error so better give root privilage)
+
+	- sudo visudo
+
+	- %target-1 ALL=(ALL) NOPASSWD:ALL     (edit inside)
+
+go to ansible server 
+create new user
+
+	- sudo adduser <username>
+	
+	- sudo passwd <username>
+
+genrate new ssh key(inside ansible(master) machine)
+
+	- ssh-keygen(enter upto create a key)
+
+copy the public key and paste in authorized_keys of target machine (target1)
+	
+	- sudo vi authorized_keys (paste the public key copied from ansible server id_rsa.pub)
+
+change owner so first change user to ansibleserver
+
+	- su - ansibleserver
+
+	- chown ansibleserver:ansibleserver /etc/ansible
+
+error occurs
+
+so go back to rootuser - exit
+
+[root]$ chown ansibleserver:ansibleserver /etc/ansible
+
+now again go to new added user(ansibleserver)
+	- su - ansibleserver
+	- cd /etc/ansible
+
+connection from ansible server to target machines
+
+	- ansible -m ping ubuntu@<public ip>
+
+now permission denied error comes
+
+so we have to go to target-1 machine (make sure we are inside of .ssh folder)
+give permission to authorized key
+
+	- chmod 600 authorized_keys
+
+now goto ansible server and check connect once again 
+
+	- ansible -m ping ubuntu@<public ip>
+
+login success from ansible server to target machine 
+
+logout from target machine
+	- exit
+
+so modify in host file:
+
+	- cd /etc/ansible/hosts
+
+	- target-1(name of hosts) ansible_ssh_host=<pub ip of target machines> 
+
+to check connection
+
+	- ansible target-1 -m ping
+
+if grouped
+
+	- ansible servers -m ping
+
+now create one yaml file inside ansible folder
+
+	- vi install_nginx.yaml
+
+paste this yaml code
+
+---
+- hosts: target-1,target-2
+  remote_user: ubuntu
+  become: yes
+  tasks:
+
+    - name: update
+      apt: update_cache=yes
+
+    - name: Install Nginx
+      apt: name=nginx state=latest
+
+
+      notify:
+        - restart nginx
+
+  handlers:
+    - name: restart nginx
+      service: name=nginx state=reloaded
+
+- hosts: target-3,target-4
+  remote_user: ec2-user
+  become: yes
+  tasks:
+
+  - name: Basically "yum"
+    yum:
+      update_cache: yes
+
+  - name: Install NGINX Packages
+    yum:
+      name: nginx
+      state: latest
+
+  - name: Start Service
+    service:
+      name: nginx
+      state: restarted
+      enabled: yes
+
+to run yaml file
+
+	- ansible-playbook install_nginx.yaml -v
+
+now we got error
+
+**********************************************ERrOR
+*
+fatal: [34.207.194.161]: FAILED! => {"msg": "Missing sudo password"}
+fatal: [54.91.132.178]: FAILED! => {"msg": "Missing sudo password"}
+
+******************************************************
+so we have to give sudo privilage to host(target nodes)
+come out from user to root user
+	- sudo visudo
+
+edit inside the file
+
+%target-1 ALL=(ALL)   NOPASSWD:ALL <example shown inside that file only>
+
+now run yaml file
+
+	- ansible-playbook install_nginx.yaml -v
+
+
+
+  
+

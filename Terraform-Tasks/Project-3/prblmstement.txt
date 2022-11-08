@@ -1,0 +1,15 @@
+Task 2 -
+
+
+Create EC2 using Terraform -
+
+   1. Create template which should have 3 ec2 instance in a single template.(tag them as Ansible, node1, node2 )
+
+   2. install Ansible in ansible server and configure the SSH and host file
+
+   3. Create ansible playbook with task update OS, install nginx, etc.
+
+
+Note - Use S3 bucket as a backend to store the tfstate file
+
+          user_data = "${file("install_apache.sh")}"

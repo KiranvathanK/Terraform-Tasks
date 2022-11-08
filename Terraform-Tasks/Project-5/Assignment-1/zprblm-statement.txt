@@ -1,0 +1,13 @@
+Assignment – 1
+Write a terraform script using aws ec2 instance and github and apply following kind of variables
+
+Types of Terraform variable – Number
+Types of Terraform variable – String
+Types of Terraform variable – List
+Types of Terraform variable – Map
+Types of Terraform variable – Boolean
+and Decare variables in
+
+Terraform file
+Override through Command Line
+Example – https://www.devopsschool.com/blog/terraform-variables-complete-reference-guide/

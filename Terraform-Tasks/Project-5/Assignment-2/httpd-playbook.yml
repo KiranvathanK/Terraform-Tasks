@@ -1,0 +1,17 @@
+- hosts: localhost
+  become: true
+  tasks:
+
+    - name: update
+      apt: update_cache=yes
+
+    - name: Install webserver 
+      apt: name=apache2 state=latest
+
+
+      notify:
+        - restart apache2
+
+  handlers:
+    - name: restart apache2
+      service: name=apache2 state=reloaded
